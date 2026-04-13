@@ -1,0 +1,735 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>商业发票生成器 | 专业CI模板</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: #eef2f5;
+            font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
+            padding: 40px 32px;
+            color: #1a2c3e;
+        }
+
+        .app-container {
+            max-width: 1600px;
+            margin: 0 auto;
+            display: flex;
+            gap: 32px;
+            flex-wrap: wrap;
+        }
+
+        .params-panel {
+            flex: 1.2;
+            min-width: 360px;
+            background: #ffffff;
+            border-radius: 28px;
+            box-shadow: 0 20px 35px -12px rgba(0, 0, 0, 0.08);
+            padding: 28px 24px;
+            border: 1px solid #e2eaf1;
+        }
+
+        .preview-area {
+            flex: 2.2;
+            min-width: 680px;
+        }
+
+        .invoice-preview {
+            background: #ffffff;
+            border-radius: 24px;
+            padding: 32px 32px 40px;
+            border: 1px solid #cfdfed;
+            box-shadow: 0 12px 28px -8px rgba(0, 0, 0, 0.08);
+        }
+
+        .invoice-header-centered {
+            text-align: center;
+            margin-bottom: 32px;
+            border-bottom: 2px solid #e3edf6;
+            padding-bottom: 24px;
+        }
+
+        .company-name {
+            font-size: 1.8rem;
+            font-weight: 700;
+            letter-spacing: -0.3px;
+            color: #1a4c7a;
+            margin-bottom: 8px;
+        }
+
+        .company-contact {
+            font-size: 0.8rem;
+            color: #4f6f8f;
+            background: #f8fbfe;
+            display: inline-block;
+            padding: 5px 16px;
+            border-radius: 40px;
+            margin-top: 4px;
+        }
+
+        .ci-title h1 {
+            font-size: 2rem;
+            font-weight: 700;
+            color: #1f4e7a;
+            letter-spacing: 2px;
+        }
+
+        .info-outer-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 24px;
+            border-radius: 16px;
+            overflow: hidden;
+            border: 1px solid #dce6f0;
+        }
+
+        .info-outer-table td {
+            border: 1px solid #dce6f0;
+            padding: 16px 18px;
+            vertical-align: top;
+            background: #fefefe;
+            width: 50%;
+        }
+
+        .inner-info-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.8rem;
+        }
+
+        .inner-info-table tr {
+            border-bottom: 1px solid #eff3f8;
+        }
+
+        .inner-info-table tr:last-child {
+            border-bottom: none;
+        }
+
+        .inner-info-table td {
+            padding: 8px 6px;
+            border: none;
+            background: transparent;
+            vertical-align: top;
+        }
+
+        .inner-info-table td:first-child {
+            font-weight: 600;
+            color: #1a4c7a;
+            width: 35%;
+            white-space: nowrap;
+        }
+
+        .section-label {
+            font-weight: 700;
+            font-size: 0.85rem;
+            color: #1f4e7a;
+            margin-bottom: 12px;
+            display: inline-block;
+            border-left: 3px solid #7c9bc0;
+            padding-left: 8px;
+        }
+
+        .invoice-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 0 0 18px;
+            font-size: 0.8rem;
+            border: 1px solid #d9e4ef;
+            border-radius: 16px;
+            overflow: hidden;
+        }
+
+        .invoice-table th,
+        .invoice-table td {
+            border: 1px solid #dce6f0;
+            padding: 12px 10px;
+            vertical-align: middle;
+        }
+
+        .invoice-table th {
+            background: #f1f7fd;
+            font-weight: 600;
+            color: #1f4e7a;
+            text-align: center;
+        }
+
+        .invoice-table td {
+            text-align: center;
+        }
+
+        .invoice-table td:nth-child(2) {
+            text-align: left;
+        }
+
+        .total-row td {
+            background: #fafeff;
+            font-weight: 700;
+            border-top: 1px solid #cddeee;
+        }
+
+        .amount-grand {
+            font-weight: 800;
+            font-size: 1rem;
+            color: #1a4c7a;
+        }
+
+        .terms-box {
+            margin: 24px 0 24px;
+            background: #fafdff;
+            padding: 18px 24px;
+            border-radius: 20px;
+            border: 1px solid #e2eef9;
+            font-size: 0.75rem;
+            line-height: 1.65;
+            color: #1f3b54;
+        }
+
+        .bank-info {
+            font-size: 0.73rem;
+            margin-top: 20px;
+            padding: 18px 20px;
+            border-radius: 20px;
+            border: 1px solid #e2eaf3;
+            background: #ffffff;
+            color: #2a577b;
+            line-height: 1.55;
+        }
+
+        .bank-info strong {
+            display: block;
+            margin-bottom: 8px;
+            color: #1a4c7a;
+        }
+
+        .sign-area {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 32px;
+            padding-top: 24px;
+            border-top: 1px solid #e0eaf3;
+        }
+
+        .sign-block {
+            width: 45%;
+            font-size: 0.75rem;
+        }
+
+        .form-section {
+            margin-bottom: 28px;
+            border-bottom: 1px solid #eef2f8;
+            padding-bottom: 22px;
+        }
+
+        .section-title {
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-weight: 600;
+            color: #4b6b8f;
+            margin-bottom: 16px;
+        }
+
+        .input-group {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            margin-bottom: 14px;
+        }
+
+        .input-row {
+            display: flex;
+            gap: 16px;
+            flex-wrap: wrap;
+        }
+
+        .input-row .input-group {
+            flex: 1;
+        }
+
+        label {
+            font-size: 0.72rem;
+            font-weight: 500;
+            color: #2c5a7a;
+        }
+
+        input, textarea, select {
+            border: 1px solid #d6e2ef;
+            border-radius: 16px;
+            padding: 10px 14px;
+            font-size: 0.8rem;
+            font-family: inherit;
+            background: #fff;
+        }
+
+        input:focus, textarea:focus {
+            border-color: #7c9bc0;
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(108, 145, 184, 0.12);
+        }
+
+        .product-table-wrapper {
+            overflow-x: auto;
+            margin: 12px 0 8px;
+            border-radius: 18px;
+            border: 1px solid #e2ecf5;
+            background: white;
+        }
+
+        .product-editor-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.75rem;
+        }
+
+        .product-editor-table th {
+            background: #f8fafd;
+            padding: 10px 6px;
+            border-bottom: 1px solid #e2ecf5;
+        }
+
+        .product-editor-table td {
+            padding: 8px 6px;
+            border-bottom: 1px solid #eff4fa;
+            text-align: center;
+        }
+
+        .product-editor-table input {
+            width: 100%;
+            padding: 6px 6px;
+            border-radius: 12px;
+        }
+
+        .btn-icon {
+            background: none;
+            border: none;
+            font-size: 1.1rem;
+            cursor: pointer;
+            color: #8ca3c0;
+        }
+
+        .add-row-btn {
+            background: #f1f6fc;
+            border: 1px dashed #b9d0e7;
+            border-radius: 40px;
+            padding: 6px 18px;
+            font-size: 0.7rem;
+            font-weight: 500;
+            cursor: pointer;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 14px;
+            margin: 28px 0 12px;
+            flex-wrap: wrap;
+        }
+
+        .btn-primary {
+            background: #1f4e7a;
+            border: none;
+            padding: 10px 26px;
+            border-radius: 40px;
+            font-weight: 600;
+            color: white;
+            cursor: pointer;
+            font-size: 0.8rem;
+        }
+
+        .btn-primary:hover {
+            background: #0f3a5c;
+        }
+
+        .btn-secondary {
+            background: white;
+            border: 1px solid #cbddee;
+            padding: 10px 22px;
+            border-radius: 40px;
+            font-weight: 500;
+            color: #2c5a7a;
+            cursor: pointer;
+        }
+
+        .file-label {
+            background: #f1f6fc;
+            padding: 10px 22px;
+            border-radius: 40px;
+            font-size: 0.8rem;
+            cursor: pointer;
+            display: inline-block;
+            border: 1px solid #cbddee;
+        }
+
+        .preview-placeholder {
+            text-align: center;
+            padding: 60px 20px;
+            color: #98b1cd;
+        }
+
+        @media print {
+            body { background: white; padding: 0; margin: 0; }
+            .params-panel, .action-buttons, .btn-primary, .btn-secondary, .file-label, .add-row-btn, .preview-placeholder { display: none !important; }
+            .app-container { display: block; margin: 0; padding: 0; }
+            .preview-area { min-width: 100%; margin: 0; padding: 0; }
+            .invoice-preview { box-shadow: none; border: 1px solid #ccc; padding: 20px; border-radius: 0; }
+        }
+    </style>
+</head>
+<body>
+<div class="app-container">
+    <div class="params-panel">
+        <div style="margin-bottom: 20px;">
+            <h3 style="font-weight: 600; color: #1f4e7a;">✍️ 发票参数配置</h3>
+            <p style="font-size: 0.7rem; color: #6c8eae;">支持手动填写 / 导入TXT模板</p>
+        </div>
+
+        <div class="form-section">
+            <div class="section-title">🏢 卖方信息</div>
+            <div class="input-group"><label>公司名称</label><input type="text" id="sellerName" value="SHANDONG TEXTILE CO.,LTD."></div>
+            <div class="input-row">
+                <div class="input-group"><label>Email</label><input type="text" id="sellerEmail" value="sales@shandongtex.com"></div>
+                <div class="input-group"><label>Tel / Wechat / WhatsApp</label><input type="text" id="sellerContact" value="+86 531 8888 6666"></div>
+            </div>
+        </div>
+
+        <div class="form-section">
+            <div class="section-title">📄 客户 & 订单</div>
+            <div class="input-group"><label>To Buyer</label><input type="text" id="toCompany" value="EURO FASHION GMBH"></div>
+            <div class="input-row"><div class="input-group"><label>Attn</label><input type="text" id="attn" value="Mr. Schmidt"></div><div class="input-group"><label>客户电话</label><input type="text" id="clientTel" value="+49 30 12345678"></div></div>
+            <div class="input-group"><label>地址</label><textarea id="clientAddress" rows="2">Kurfürstendamm 21, 10719 Berlin, Germany</textarea></div>
+            <div class="input-row"><div class="input-group"><label>PI No.</label><input type="text" id="piNo" value="PI-SDT-2405"></div><div class="input-group"><label>PO No.</label><input type="text" id="poNo" value="PO-9823-EF"></div></div>
+            <div class="input-row"><div class="input-group"><label>Date</label><input type="text" id="invoiceDate" value="2026-04-13"></div><div class="input-group"><label>Price Term</label><input type="text" id="priceTerm" value="FOB SHANGHAI"></div></div>
+        </div>
+
+        <div class="form-section">
+            <div class="section-title">📦 产品明细</div>
+            <div class="product-table-wrapper">
+                <table class="product-editor-table">
+                    <thead><tr><th>No.</th><th>产品描述</th><th>数量</th><th>单价(USD)</th><th>金额</th><th></th></tr></thead>
+                    <tbody id="productTbody"></tbody>
+                </table>
+            </div>
+            <button type="button" class="add-row-btn" id="addProductRowBtn">+ 添加产品</button>
+        </div>
+
+        <div class="form-section">
+            <div class="section-title">⚙️ 条款与包装</div>
+            <div class="input-group"><label>原产地</label><input type="text" id="originCountry" value="Peoples Republic of China"></div>
+            <div class="input-group"><label>付款方式</label><input type="text" id="paymentTerms" value="30% T/T in advance, balance before shipment"></div>
+            <div class="input-group"><label>交货期</label><input type="text" id="deliveryTime" value="About 30-40 days after receiving the payment"></div>
+            <div class="input-row"><div class="input-group"><label>包装方式</label><input type="text" id="packaging" value="by roll then in box"></div><div class="input-group"><label>唛头</label><input type="text" id="shippingMark" value="N/M"></div></div>
+        </div>
+
+        <div class="form-section">
+            <div class="section-title">🏦 受益人银行信息</div>
+            <div class="input-group"><label>BENEFICIARY</label><input type="text" id="beneficiary" value="SHANDONG TEXTILE CO.,LTD."></div>
+            <div class="input-group"><label>ADDRESS</label><input type="text" id="beneficiaryAddr" value="No.168 Jingsi Road, Jinan, China"></div>
+            <div class="input-group"><label>BENEFICIARY BANK</label><input type="text" id="bankName" value="BANK OF CHINA Shandong Branch"></div>
+            <div class="input-row"><div class="input-group"><label>BANK ADD</label><input type="text" id="bankAddr" value="156 Lixia District, Jinan"></div><div class="input-group"><label>ACCOUNT FOR USD</label><input type="text" id="accountUsd" value="6013 8223 0001 2345"></div></div>
+            <div class="input-group"><label>SWIFT</label><input type="text" id="swiftCode" value="BKCHCNBJ51A"></div>
+        </div>
+
+        <div class="action-buttons">
+            <button class="btn-primary" id="generateBtn">✨ 生成商业发票</button>
+            <button class="btn-secondary" id="printBtn">🖨️ 打印发票</button>
+            <button class="btn-secondary" id="downloadTemplateBtn">📥 下载模板</button>
+            <label class="file-label btn-secondary">📂 导入TXT模板<input type="file" id="txtImport" accept=".txt" style="display: none;"></label>
+            <button class="btn-secondary" id="resetExampleBtn">重置示例</button>
+        </div>
+        <p style="font-size: 0.65rem; color: #7e95b0;">※ TXT格式：冒号左边为字段名（请勿修改），右边为可替换的值。产品行以 Product: 开头。</p>
+    </div>
+
+    <div class="preview-area">
+        <div id="invoicePreviewContainer" class="invoice-preview">
+            <div class="preview-placeholder">✨ 填写参数后点击「生成商业发票」</div>
+        </div>
+    </div>
+</div>
+
+<script>
+    let productRows = [];
+
+    function escapeHtml(str) {
+        if (!str) return '';
+        return str.replace(/[&<>]/g, function(m) {
+            if (m === '&') return '&amp;';
+            if (m === '<') return '&lt;';
+            if (m === '>') return '&gt;';
+            return m;
+        });
+    }
+
+    function renderProductEditor() {
+        const tbody = document.getElementById('productTbody');
+        tbody.innerHTML = '';
+        productRows.forEach((row, idx) => {
+            const tr = document.createElement('tr');
+            tr.innerHTML = `
+                <td>${idx+1}</td>
+                <td><input type="text" class="prod-desc" value="${escapeHtml(row.description)}"></td>
+                <td><input type="number" class="prod-qty" value="${row.quantity}" step="1" min="0"></td>
+                <td><input type="number" class="prod-price" value="${row.unitPrice}" step="0.01" min="0"></td>
+                <td class="row-amount">${(row.quantity * row.unitPrice).toFixed(2)}</td>
+                <td><button class="btn-icon del-row" data-index="${idx}">🗑️</button></td>
+            `;
+            tbody.appendChild(tr);
+        });
+        document.querySelectorAll('#productTbody tr').forEach((row, idx) => {
+            const descInput = row.querySelector('.prod-desc');
+            const qtyInput = row.querySelector('.prod-qty');
+            const priceInput = row.querySelector('.prod-price');
+            const delBtn = row.querySelector('.del-row');
+            const update = () => {
+                const newQty = parseFloat(qtyInput.value) || 0;
+                const newPrice = parseFloat(priceInput.value) || 0;
+                productRows[idx].description = descInput.value;
+                productRows[idx].quantity = newQty;
+                productRows[idx].unitPrice = newPrice;
+                const amountCell = row.querySelector('.row-amount');
+                if (amountCell) amountCell.innerText = (newQty * newPrice).toFixed(2);
+            };
+            descInput.addEventListener('input', update);
+            qtyInput.addEventListener('input', update);
+            priceInput.addEventListener('input', update);
+            if (delBtn) delBtn.addEventListener('click', () => {
+                productRows.splice(idx, 1);
+                renderProductEditor();
+            });
+        });
+    }
+
+    function addProductRow(desc = "Cotton Fabric", qty = 100, price = 2.5) {
+        productRows.push({ description: desc, quantity: qty, unitPrice: price });
+        renderProductEditor();
+    }
+
+    function computeTotal() {
+        return productRows.reduce((sum, p) => sum + (p.quantity * p.unitPrice), 0);
+    }
+
+    function renderInvoice() {
+        const sellerName = document.getElementById('sellerName').value.trim() || "SHANDONG COMPANY";
+        const sellerEmail = document.getElementById('sellerEmail').value;
+        const sellerContact = document.getElementById('sellerContact').value;
+        const toCompany = document.getElementById('toCompany').value;
+        const attn = document.getElementById('attn').value;
+        const clientTel = document.getElementById('clientTel').value;
+        const clientAddress = document.getElementById('clientAddress').value;
+        const piNo = document.getElementById('piNo').value;
+        const poNo = document.getElementById('poNo').value;
+        const invoiceDate = document.getElementById('invoiceDate').value;
+        const priceTerm = document.getElementById('priceTerm').value;
+        const originCountry = document.getElementById('originCountry').value;
+        const paymentTerms = document.getElementById('paymentTerms').value;
+        const deliveryTime = document.getElementById('deliveryTime').value;
+        const packaging = document.getElementById('packaging').value;
+        const shippingMark = document.getElementById('shippingMark').value;
+        const beneficiary = document.getElementById('beneficiary').value;
+        const beneficiaryAddr = document.getElementById('beneficiaryAddr').value;
+        const bankName = document.getElementById('bankName').value;
+        const bankAddr = document.getElementById('bankAddr').value;
+        const accountUsd = document.getElementById('accountUsd').value;
+        const swiftCode = document.getElementById('swiftCode').value;
+        const totalAmount = computeTotal();
+
+        let productsHtml = '';
+        productRows.forEach((item, idx) => {
+            const amt = (item.quantity * item.unitPrice).toFixed(2);
+            productsHtml += `<tr><td>${idx+1}</td><td style="text-align:left;">${escapeHtml(item.description)}</td><td>${item.quantity}</td><td>${item.unitPrice.toFixed(2)}</td><td>${amt}</td></tr>`;
+        });
+        if (productRows.length === 0) productsHtml = `<tr><td colspan="5" style="text-align:center;">暂无产品明细</td></tr>`;
+
+        const buyerInnerTable = `<table class="inner-info-table"><tr><td>Company</td><td><strong>${escapeHtml(toCompany)}</strong></td></tr><tr><td>Attn</td><td>${escapeHtml(attn)}</td></tr><tr><td>Address</td><td>${escapeHtml(clientAddress)}</td></tr><tr><td>Tel</td><td>${escapeHtml(clientTel)}</td></tr></table>`;
+        const orderInnerTable = `<table class="inner-info-table"><tr><td>PI No.</td><td>${escapeHtml(piNo)}</td></tr><tr><td>PO No.</td><td>${escapeHtml(poNo)}</td></tr><tr><td>Invoice Date</td><td>${escapeHtml(invoiceDate)}</td></tr><tr><td>Price Term</td><td>${escapeHtml(priceTerm)}</td></tr></table>`;
+        const infoTableHtml = `<table class="info-outer-table"><tr><td><div class="section-label">📌 TO BUYER</div>${buyerInnerTable}</td><td><div class="section-label">📄 ORDER REFERENCE</div>${orderInnerTable}</td></tr></table>`;
+
+        const invoiceHtml = `
+            <div class="invoice-header-centered">
+                <div class="company-name">${escapeHtml(sellerName)}</div>
+                <div class="company-contact">📧 ${escapeHtml(sellerEmail)} &nbsp;|&nbsp; 📞 ${escapeHtml(sellerContact)}</div>
+                <div class="ci-title"><h1>COMMERCIAL INVOICE</h1></div>
+            </div>
+            ${infoTableHtml}
+            <table class="invoice-table">
+                <thead><tr><th>No.</th><th>Products Description</th><th>Quantity (pcs)</th><th>Unit Price (USD)</th><th>Amount (USD)</th></tr></thead>
+                <tbody>${productsHtml}</tbody>
+                <tfoot><tr class="total-row"><td colspan="4" style="text-align:right;">Total Amount :</td><td class="amount-grand">${totalAmount.toFixed(2)} USD</td></tr></tfoot>
+            </table>
+            <div class="terms-box">
+                <div>1. COUNTRY OF ORIGIN: ${escapeHtml(originCountry)}</div>
+                <div>2. TERMS OF PAYMENT: ${escapeHtml(paymentTerms)}</div>
+                <div>3. DELIVERY TIME: ${escapeHtml(deliveryTime)}</div>
+                <div>4. PACKAGING: ${escapeHtml(packaging)}</div>
+                <div>5. SHIPPING MARK: ${escapeHtml(shippingMark)}</div>
+            </div>
+            <div class="bank-info">
+                <strong>🏦 SELLER (BENEFICIARY)'S SPECIFIC INFORMATION</strong>
+                BENEFICIARY: ${escapeHtml(beneficiary)}<br>
+                ADDRESS: ${escapeHtml(beneficiaryAddr)}<br>
+                BENEFICIARY BANK: ${escapeHtml(bankName)}<br>
+                BANK ADD: ${escapeHtml(bankAddr)}<br>
+                ACCOUNT FOR USD: ${escapeHtml(accountUsd)} &nbsp;&nbsp; SWIFT: ${escapeHtml(swiftCode)}
+            </div>
+            <div class="sign-area">
+                <div class="sign-block"><strong>THE SELLER</strong><br><br>${escapeHtml(sellerName)}<br><br>(Authorized Signature)</div>
+                <div class="sign-block"><strong>THE BUYER</strong><br><br>${escapeHtml(toCompany)}<br><br>(Authorized Signature)</div>
+            </div>
+        `;
+        document.getElementById('invoicePreviewContainer').innerHTML = invoiceHtml;
+    }
+
+    function importFromTxt(content) {
+        const lines = content.split(/\r?\n/);
+        const fieldMap = {
+            "sellerName": ["公司名称:", "卖方公司:", "Seller:"],
+            "sellerEmail": ["Email:", "邮箱:"],
+            "sellerContact": ["Tel:", "电话:", "Contact:"],
+            "toCompany": ["To:", "客户公司:", "Buyer:"],
+            "attn": ["Attn:", "联系人:"],
+            "clientTel": ["客户电话:", "Buyer Tel:"],
+            "clientAddress": ["地址:", "Address:", "Buyer Address:"],
+            "piNo": ["PI No.", "PI号:"],
+            "poNo": ["PO No.", "PO号:"],
+            "invoiceDate": ["Date:", "日期:"],
+            "priceTerm": ["Price Term:", "价格术语:"],
+            "originCountry": ["原产地:", "Origin:"],
+            "paymentTerms": ["付款方式:", "Payment:"],
+            "deliveryTime": ["交货期:", "Delivery:"],
+            "packaging": ["包装:", "Packaging:"],
+            "shippingMark": ["唛头:", "Shipping Mark:"],
+            "beneficiary": ["BENEFICIARY:", "受益人:"],
+            "beneficiaryAddr": ["受益人地址:", "Beneficiary Address:"],
+            "bankName": ["BENEFICIARY BANK:", "银行名称:"],
+            "bankAddr": ["BANK ADD:", "银行地址:"],
+            "accountUsd": ["ACCOUNT:", "账号:"],
+            "swiftCode": ["SWIFT:", "SWIFT:"]
+        };
+        for (let line of lines) {
+            line = line.trim();
+            if (line.startsWith("Product:") || line.startsWith("产品:")) {
+                let parts = line.substring(line.indexOf(":")+1).split(",");
+                if (parts.length >= 3) {
+                    let desc = parts[0].trim();
+                    let qty = parseFloat(parts[1]);
+                    let price = parseFloat(parts[2]);
+                    if (!isNaN(qty) && !isNaN(price)) addProductRow(desc, qty, price);
+                }
+                continue;
+            }
+            for (let [fieldId, keywords] of Object.entries(fieldMap)) {
+                for (let kw of keywords) {
+                    if (line.toLowerCase().startsWith(kw.toLowerCase())) {
+                        let value = line.substring(kw.length).trim();
+                        let ele = document.getElementById(fieldId);
+                        if (ele) ele.value = value;
+                        break;
+                    }
+                }
+            }
+        }
+        renderProductEditor();
+        renderInvoice();
+    }
+
+    // 修正模板：全部使用冒号，无等号，明确注释
+    function downloadTemplate() {
+        const templateContent = `# 商业发票模板 - 冒号左边为固定字段名（请勿修改），右边为示例值（可任意替换）
+# 产品行请使用 "Product:" 开头，格式：Product:产品描述,数量,单价
+# 示例：
+Seller: SHANDONG TEXTILE CO.,LTD.
+Email: sales@shandongtex.com
+Tel: +86 531 8888 6666
+To: EURO FASHION GMBH
+Attn: Mr. Schmidt
+Buyer Tel: +49 30 12345678
+Address: Kurfürstendamm 21, 10719 Berlin, Germany
+PI No.: PI-SDT-2405
+PO No.: PO-9823-EF
+Date: 2026-04-13
+Price Term: FOB SHANGHAI
+Origin: Peoples Republic of China
+Payment: 30% T/T in advance, balance before shipment
+Delivery: About 30-40 days after receiving the payment
+Packaging: by roll then in box
+Shipping Mark: N/M
+BENEFICIARY: SHANDONG TEXTILE CO.,LTD.
+Beneficiary Address: No.168 Jingsi Road, Jinan, China
+BENEFICIARY BANK: BANK OF CHINA Shandong Branch
+BANK ADD: 156 Lixia District, Jinan
+ACCOUNT: 6013 8223 0001 2345
+SWIFT: BKCHCNBJ51A
+
+# 产品明细（可多行）
+Product:100% Cotton Yarn 32S,5000,1.85
+Product:Polyester Fabric 240T,3200,2.3
+`;
+        const blob = new Blob([templateContent], {type: "text/plain;charset=utf-8"});
+        const link = document.createElement('a');
+        const url = URL.createObjectURL(blob);
+        link.href = url;
+        link.download = "invoice_template.txt";
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        URL.revokeObjectURL(url);
+    }
+
+    function resetExample() {
+        document.getElementById('sellerName').value = "SHANDONG TEXTILE CO.,LTD.";
+        document.getElementById('sellerEmail').value = "sales@shandongtex.com";
+        document.getElementById('sellerContact').value = "+86 531 8888 6666";
+        document.getElementById('toCompany').value = "EURO FASHION GMBH";
+        document.getElementById('attn').value = "Mr. Schmidt";
+        document.getElementById('clientTel').value = "+49 30 12345678";
+        document.getElementById('clientAddress').value = "Kurfürstendamm 21, 10719 Berlin, Germany";
+        document.getElementById('piNo').value = "PI-SDT-2405";
+        document.getElementById('poNo').value = "PO-9823-EF";
+        document.getElementById('invoiceDate').value = "2026-04-13";
+        document.getElementById('priceTerm').value = "FOB SHANGHAI";
+        document.getElementById('originCountry').value = "Peoples Republic of China";
+        document.getElementById('paymentTerms').value = "30% T/T in advance, balance before shipment";
+        document.getElementById('deliveryTime').value = "About 30-40 days after receiving the payment";
+        document.getElementById('packaging').value = "by roll then in box";
+        document.getElementById('shippingMark').value = "N/M";
+        document.getElementById('beneficiary').value = "SHANDONG TEXTILE CO.,LTD.";
+        document.getElementById('beneficiaryAddr').value = "No.168 Jingsi Road, Jinan, China";
+        document.getElementById('bankName').value = "BANK OF CHINA Shandong Branch";
+        document.getElementById('bankAddr').value = "156 Lixia District, Jinan";
+        document.getElementById('accountUsd').value = "6013 8223 0001 2345";
+        document.getElementById('swiftCode').value = "BKCHCNBJ51A";
+        productRows = [];
+        addProductRow("100% Cotton Yarn 32S", 5000, 1.85);
+        addProductRow("Polyester Fabric 240T", 3200, 2.3);
+        renderInvoice();
+    }
+
+    function printInvoice() { window.print(); }
+
+    document.getElementById('generateBtn').addEventListener('click', renderInvoice);
+    document.getElementById('printBtn').addEventListener('click', printInvoice);
+    document.getElementById('downloadTemplateBtn').addEventListener('click', downloadTemplate);
+    document.getElementById('addProductRowBtn').addEventListener('click', () => addProductRow("New Item", 10, 1.0));
+    document.getElementById('resetExampleBtn').addEventListener('click', resetExample);
+    document.getElementById('txtImport').addEventListener('change', (e) => {
+        const file = e.target.files[0];
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = (ev) => { importFromTxt(ev.target.result); };
+        reader.readAsText(file, 'UTF-8');
+        e.target.value = '';
+    });
+
+    // 初始化
+    productRows = [];
+    addProductRow("100% Cotton Yarn 32S", 5000, 1.85);
+    addProductRow("Polyester Fabric 240T", 3200, 2.3);
+    renderInvoice();
+</script>
+</body>
+</html>
